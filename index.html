@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Internship Scam Detector</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    textarea { width: 100%; height: 120px; }
+    button { padding: 10px; margin-top: 10px; }
+    .output { margin-top: 20px; white-space: pre-line; }
+  </style>
+</head>
+<body>
+
+<h2>Internship Scam Detector</h2>
+
+<textarea id="input" placeholder="Paste internship details here..."></textarea>
+
+<br>
+<button onclick="analyze()">Analyze</button>
+
+<div class="output" id="output"></div>
+
+<script>
+function analyze() {
+  let text = document.getElementById("input").value.toLowerCase();
+  let score = 0;
+  let redFlags = [];
+
+  if (text.includes("fee") || text.includes("pay")) {
+    score += 40;
+    redFlags.push("Upfront payment required");
+  }
+
+  if (text.includes("no interview") || text.includes("direct selection")) {
+    score += 20;
+    redFlags.push("No interview process");
+  }
+
+  if (text.includes("whatsapp")) {
+    score += 10;
+    redFlags.push("Unofficial communication");
+  }
+
+  if (text.includes("gmail.com")) {
+    score += 10;
+    redFlags.push("Non-official email domain");
+  }
+
+  if (text.includes("30,000") || text.includes("50000")) {
+    score += 10;
+    redFlags.push("Unrealistic stipend");
+  }
+
+  let result = "Scam Score: " + score + "/100\n\n";
+
+  if (score > 70) result += "Risk Level: SCAM\n";
+  else if (score > 40) result += "Risk Level: HIGH RISK\n";
+  else result += "Risk Level: SAFE\n";
+
+  result += "\nRed Flags:\n- " + redFlags.join("\n- ");
+
+  document.getElementById("output").innerText = result;
+}
+</script>
+
+</body>
+</html>
