@@ -35,3 +35,39 @@ Avoid
 
 Next Action:
 Do not pay any money. Search for the company on LinkedIn and its official website. Ask for company registration details and verified HR contact before proceeding.
+--------------------------------------------------
+
+## Test Case 2
+
+Input:
+Company: Tata Technologies  
+Role: Mechanical Design Intern  
+Stipend: ₹12,000/month  
+Selection: Resume screening + technical interview  
+Email: careers@tatatechnologies.com  
+Requirement: AutoCAD, SolidWorks  
+
+Output:
+Scam Score: 12/100
+
+Risk Level:
+SAFE
+
+Red Flags:
+- Slightly low stipend (but normal for internship)
+
+Trust Signals:
+- Official company domain email
+- Clear job role and responsibilities
+- Defined skill requirements
+- Proper interview process
+- No payment required
+
+Priority Reasoning:
+The presence of a structured hiring process and official company communication strongly indicates legitimacy.
+
+Final Decision:
+Apply
+
+Next Action:
+Prepare AutoCAD and SolidWorks basics, revise mechanical design concepts, and get ready for technical interview.
