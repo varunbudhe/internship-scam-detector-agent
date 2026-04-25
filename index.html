@@ -1,134 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Internship Scam Detector</title>
+
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
       padding: 20px;
-      background: #f5f5f5;
+      color: #222;
     }
 
-    h2 {
-      color: #333;
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #111;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
     }
 
     textarea {
       width: 100%;
-      height: 140px;
-      padding: 10px;
-      border-radius: 8px;
+      min-height: 180px;
+      padding: 14px;
+      font-size: 15px;
+      border-radius: 10px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
+      resize: vertical;
     }
 
     button {
-      padding: 10px 20px;
-      margin-top: 10px;
+      margin-top: 14px;
+      padding: 12px 22px;
       border: none;
-      border-radius: 6px;
-      background: #007bff;
+      border-radius: 8px;
+      background: #2563eb;
       color: white;
-      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
     }
 
     .output {
-      margin-top: 20px;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #ddd;
       white-space: pre-line;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .warning {
+      color: #b45309;
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
+  <div class="container">
+    <h1>Internship Scam Detector</h1>
 
-<h2>Internship Scam Detector</h2>
+    <p>
+      Paste full internship or job details below. The detector checks for scam signals like
+      payment requests, fake urgency, unofficial emails, no interview process, and unrealistic offers.
+    </p>
 
-<p>Paste internship/job details below to analyze scam risk using AI-based logic.</p>
+    <textarea id="input" placeholder="Example:
+Company: GrowthHack Academy
+Role: Data Analyst Intern
+Stipend: ₹30,000/month
+Selection: Direct selection, no interview
+Condition: ₹5000 training fee before joining
+Contact: WhatsApp only
+Email: growthhackjobs@gmail.com"></textarea>
 
-<textarea id="input" placeholder="Paste full internship/job details here: company, role, stipend, selection process, payment request, email/contact..."></textarea>
+    <button onclick="analyzeOffer()">Analyze Offer</button>
 
-<br>
-<button onclick="analyze()">Analyze</button>
+    <div id="output" class="output">
+      Result will appear here after analysis.
+    </div>
+  </div>
 
-<div class="output" id="output"></div>
+  <script>
+    function analyzeOffer() {
+      const input = document.getElementById("input").value.trim();
+      const text = input.toLowerCase();
+      const output = document.getElementById("output");
 
-<script>
-function analyze() {
-  let text = document.getElementById("input").value.toLowerCase();
+      if (input.length < 40) {
+        output.innerHTML =
+          "<span class='warning'>Please paste proper internship/job details. Random words cannot be analyzed.</span>";
+        return;
+      }
 
-  let score = 0;
-  let redFlags = [];
-  let trustSignals = [];
+      let score = 0;
+      let redFlags = [];
+      let trustSignals = [];
 
-  // Scam keywords
-  if (text.includes("scam") || text.includes("fake") || text.includes("fraud")) {
-    score += 50;
-    redFlags.push("Suspicious scam-related wording detected");
-  }
+      const hasPayment =
+        text.includes("fee") ||
+        text.includes("pay") ||
+        text.includes("payment") ||
+        text.includes("deposit") ||
+        text.includes("registration") ||
+        text.includes("training fee") ||
+        text.includes("security deposit");
 
-  // Payment detection
-  if (text.includes("fee") || text.includes("pay") || text.includes("deposit")) {
-    score += 40;
-    redFlags.push("Upfront payment required");
-  }
+      const hasNoInterview =
+        text.includes("no interview") ||
+        text.includes("direct selection") ||
+        text.includes("selected without interview") ||
+        text.includes("instant selection");
 
-  // No interview
-  if (text.includes("no interview") || text.includes("direct selection")) {
-    score += 20;
-    redFlags.push("No interview process");
-  }
+      const hasWhatsapp =
+        text.includes("whatsapp") ||
+        text.includes("telegram");
 
-  // WhatsApp
-  if (text.includes("whatsapp")) {
-    score += 10;
-    redFlags.push("Unofficial communication (WhatsApp)");
-  }
+      const hasUnofficialEmail =
+        text.includes("gmail.com") ||
+        text.includes("yahoo.com") ||
+        text.includes("outlook.com");
 
-  // Gmail
-  if (text.includes("gmail.com")) {
-    score += 10;
-    redFlags.push("Non-official email domain");
-  } else if (text.includes("@")) {
-    trustSignals.push("Official domain email detected");
-  }
+      const hasUrgency =
+        text.includes("urgent") ||
+        text.includes("join immediately") ||
+        text.includes("limited seats") ||
+        text.includes("within 24 hours");
 
-  // High salary
-  if (text.includes("30000") || text.includes("50000") || text.includes("80000")) {
-    score += 10;
-    redFlags.push("Possibly unrealistic stipend");
-  }
+      const hasHighSalary =
+        text.includes("30000") ||
+        text.includes("30,000") ||
+        text.includes("50000") ||
+        text.includes("50,000") ||
+        text.includes("80000") ||
+        text.includes("80,000");
 
-  // Proper process
-  if (text.includes("interview")) {
-    trustSignals.push("Interview process mentioned");
-  }
+      const hasInterview =
+        text.includes("interview") ||
+        text.includes("technical round") ||
+        text.includes("hr round");
 
-  // Cap score
-  if (score > 100) score = 100;
+      const hasOfficialEmail =
+        text.includes("@") && !hasUnofficialEmail;
 
-  // Risk level
-  let risk = "SAFE";
-  if (score > 70) risk = "SCAM";
-  else if (score > 40) risk = "HIGH RISK";
-  else if (score > 20) risk = "VERIFY FIRST";
+      const hasCompanyDetails =
+        text.includes("company") ||
+        text.includes("website") ||
+        text.includes("linkedin") ||
+        text.includes("official");
 
-  // Output formatting
-  let result = "Scam Score: " + score + "/100\n\n";
-  result += "Risk Level: " + risk + "\n\n";
+      if (hasPayment) {
+        score += 40;
+        redFlags.push("Upfront payment, fee, deposit, or registration charge mentioned");
+      }
 
-  result += "Red Flags:\n";
-  if (redFlags.length === 0) result += "- None\n";
-  else result += "- " + redFlags.join("\n- ") + "\n";
+      if (hasNoInterview) {
+        score += 25;
+        redFlags.push("No proper interview or direct selection mentioned");
+      }
 
-  result += "\nTrust Signals:\n";
-  if (trustSignals.length === 0) result += "- None\n";
-  else result += "- " + trustSignals.join("\n- ");
+      if (hasWhatsapp) {
+        score += 15;
+        redFlags.push("Recruitment communication depends on WhatsApp/Telegram");
+      }
 
-  document.getElementById("output").innerText = result;
-}
-</script>
+      if (hasUnofficialEmail) {
+        score += 15;
+        redFlags.push("Unofficial email domain used");
+      }
 
-</body>
-</html>
+      if (has
