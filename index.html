@@ -15,17 +15,17 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 850px;
       margin: auto;
-      background: white;
+      background: #ffffff;
       padding: 24px;
       border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
     }
 
     h1 {
       margin-top: 0;
-      color: #111;
+      color: #111827;
     }
 
     p {
@@ -35,13 +35,18 @@
 
     textarea {
       width: 100%;
-      min-height: 180px;
+      min-height: 190px;
       padding: 14px;
       font-size: 15px;
       border-radius: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #cbd5e1;
       box-sizing: border-box;
       resize: vertical;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #2563eb;
     }
 
     button {
@@ -53,6 +58,7 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
+      font-weight: bold;
     }
 
     button:hover {
@@ -64,15 +70,16 @@
       padding: 18px;
       border-radius: 12px;
       background: #f9fafb;
-      border: 1px solid #ddd;
+      border: 1px solid #e5e7eb;
       white-space: pre-line;
       font-size: 15px;
       line-height: 1.6;
     }
 
-    .warning {
-      color: #b45309;
-      font-weight: bold;
+    .note {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 12px;
     }
   </style>
 </head>
@@ -82,11 +89,12 @@
     <h1>Internship Scam Detector</h1>
 
     <p>
-      Paste full internship or job details below. The detector checks for scam signals like
-      payment requests, fake urgency, unofficial emails, no interview process, and unrealistic offers.
+      Paste full internship or job details below. This tool checks for scam signals like
+      payment requests, unofficial emails, WhatsApp-only communication, no interview process,
+      urgency pressure, and unrealistic offers.
     </p>
 
-    <textarea id="input" placeholder="Example:
+    <textarea id="jobInput" placeholder="Example:
 Company: GrowthHack Academy
 Role: Data Analyst Intern
 Stipend: ₹30,000/month
@@ -97,58 +105,64 @@ Email: growthhackjobs@gmail.com"></textarea>
 
     <button onclick="analyzeOffer()">Analyze Offer</button>
 
-    <div id="output" class="output">
+    <div id="resultBox" class="output">
       Result will appear here after analysis.
+    </div>
+
+    <div class="note">
+      Note: This is a rule-based demo agent. Final verification should be done using official company sources.
     </div>
   </div>
 
   <script>
     function analyzeOffer() {
-      const input = document.getElementById("input").value.trim();
-      const text = input.toLowerCase();
-      const output = document.getElementById("output");
+      var input = document.getElementById("jobInput").value.trim();
+      var resultBox = document.getElementById("resultBox");
 
       if (input.length < 40) {
-        output.innerHTML =
-          "<span class='warning'>Please paste proper internship/job details. Random words cannot be analyzed.</span>";
+        resultBox.innerText = "⚠️ Please paste proper internship/job details. Random or very short text cannot be analyzed.";
         return;
       }
 
-      let score = 0;
-      let redFlags = [];
-      let trustSignals = [];
+      var text = input.toLowerCase();
 
-      const hasPayment =
+      var score = 0;
+      var redFlags = [];
+      var trustSignals = [];
+
+      var hasPayment =
         text.includes("fee") ||
         text.includes("pay") ||
         text.includes("payment") ||
         text.includes("deposit") ||
         text.includes("registration") ||
         text.includes("training fee") ||
-        text.includes("security deposit");
+        text.includes("security deposit") ||
+        text.includes("refundable");
 
-      const hasNoInterview =
+      var hasNoInterview =
         text.includes("no interview") ||
         text.includes("direct selection") ||
-        text.includes("selected without interview") ||
-        text.includes("instant selection");
+        text.includes("instant selection") ||
+        text.includes("selected without interview");
 
-      const hasWhatsapp =
+      var hasUnofficialChat =
         text.includes("whatsapp") ||
         text.includes("telegram");
 
-      const hasUnofficialEmail =
+      var hasUnofficialEmail =
         text.includes("gmail.com") ||
         text.includes("yahoo.com") ||
-        text.includes("outlook.com");
+        text.includes("outlook.com") ||
+        text.includes("hotmail.com");
 
-      const hasUrgency =
+      var hasUrgency =
         text.includes("urgent") ||
         text.includes("join immediately") ||
-        text.includes("limited seats") ||
-        text.includes("within 24 hours");
+        text.includes("within 24 hours") ||
+        text.includes("limited seats");
 
-      const hasHighSalary =
+      var hasHighSalary =
         text.includes("30000") ||
         text.includes("30,000") ||
         text.includes("50000") ||
@@ -156,19 +170,25 @@ Email: growthhackjobs@gmail.com"></textarea>
         text.includes("80000") ||
         text.includes("80,000");
 
-      const hasInterview =
+      var hasScamConcern =
+        text.includes("scam") ||
+        text.includes("fake") ||
+        text.includes("fraud");
+
+      var hasInterview =
         text.includes("interview") ||
         text.includes("technical round") ||
-        text.includes("hr round");
+        text.includes("hr round") ||
+        text.includes("screening");
 
-      const hasOfficialEmail =
+      var hasOfficialEmail =
         text.includes("@") && !hasUnofficialEmail;
 
-      const hasCompanyDetails =
-        text.includes("company") ||
+      var hasCompanyProof =
         text.includes("website") ||
         text.includes("linkedin") ||
-        text.includes("official");
+        text.includes("official") ||
+        text.includes("company registration");
 
       if (hasPayment) {
         score += 40;
@@ -180,14 +200,105 @@ Email: growthhackjobs@gmail.com"></textarea>
         redFlags.push("No proper interview or direct selection mentioned");
       }
 
-      if (hasWhatsapp) {
+      if (hasUnofficialChat) {
         score += 15;
-        redFlags.push("Recruitment communication depends on WhatsApp/Telegram");
+        redFlags.push("WhatsApp/Telegram-based communication detected");
       }
 
       if (hasUnofficialEmail) {
         score += 15;
-        redFlags.push("Unofficial email domain used");
+        redFlags.push("Unofficial email domain detected");
       }
 
-      if (has
+      if (hasUrgency) {
+        score += 15;
+        redFlags.push("Urgency or pressure tactic detected");
+      }
+
+      if (hasHighSalary) {
+        score += 10;
+        redFlags.push("High stipend/salary may be unrealistic for fresher or intern role");
+      }
+
+      if (hasScamConcern) {
+        score += 20;
+        redFlags.push("Input mentions scam/fake/fraud concern");
+      }
+
+      if (hasInterview && !hasNoInterview) {
+        trustSignals.push("Interview or screening process is mentioned");
+      }
+
+      if (hasOfficialEmail) {
+        trustSignals.push("Company-style email domain appears to be present");
+      }
+
+      if (hasCompanyProof) {
+        trustSignals.push("Company verification detail is mentioned");
+      }
+
+      if (!hasPayment && !hasNoInterview && !hasUnofficialChat && !hasUnofficialEmail && input.length > 80) {
+        trustSignals.push("No major scam keyword detected in the given details");
+      }
+
+      if (score > 100) {
+        score = 100;
+      }
+
+      var riskLevel = "SAFE";
+      var decision = "Apply";
+
+      if (score >= 75) {
+        riskLevel = "SCAM";
+        decision = "Avoid";
+      } else if (score >= 50) {
+        riskLevel = "HIGH RISK";
+        decision = "Verify First";
+      } else if (score >= 25) {
+        riskLevel = "VERIFY FIRST";
+        decision = "Verify First";
+      }
+
+      var reasoning = "";
+
+      if (hasPayment) {
+        reasoning = "The biggest concern is money being requested before joining. Genuine internships usually do not ask candidates to pay fees, deposits, or registration charges.";
+      } else if (hasNoInterview) {
+        reasoning = "The biggest concern is lack of proper evaluation. Direct selection without interview is risky.";
+      } else if (hasUnofficialEmail || hasUnofficialChat) {
+        reasoning = "The biggest concern is weak verification through unofficial communication channels.";
+      } else {
+        reasoning = "No major scam signal was detected from the provided details, but company verification is still recommended.";
+      }
+
+      var nextAction = "";
+
+      if (decision === "Avoid") {
+        nextAction = "Do not pay money or share sensitive documents. Verify only through official website, LinkedIn, and domain-based HR email.";
+      } else if (decision === "Verify First") {
+        nextAction = "Ask for official website, company LinkedIn, domain-based HR email, offer letter, and company registration details before proceeding.";
+      } else {
+        nextAction = "Proceed with the application, but verify company identity before sharing Aadhaar, PAN, bank details, or personal documents.";
+      }
+
+      var output = "";
+      output += "Scam Score: " + score + "/100\n\n";
+      output += "Risk Level: " + riskLevel + "\n\n";
+
+      output += "Red Flags:\n";
+      output += redFlags.length > 0 ? "- " + redFlags.join("\n- ") : "- None detected";
+      output += "\n\n";
+
+      output += "Trust Signals:\n";
+      output += trustSignals.length > 0 ? "- " + trustSignals.join("\n- ") : "- None clearly detected";
+      output += "\n\n";
+
+      output += "Priority Reasoning:\n" + reasoning + "\n\n";
+      output += "Final Decision:\n" + decision + "\n\n";
+      output += "Next Action:\n" + nextAction;
+
+      resultBox.innerText = output;
+    }
+  </script>
+</body>
+</html>
