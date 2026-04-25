@@ -3,17 +3,51 @@
 <head>
   <title>Internship Scam Detector</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    textarea { width: 100%; height: 120px; }
-    button { padding: 10px; margin-top: 10px; }
-    .output { margin-top: 20px; white-space: pre-line; }
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    textarea {
+      width: 100%;
+      height: 140px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+
+    .output {
+      margin-top: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      white-space: pre-line;
+    }
   </style>
 </head>
+
 <body>
 
 <h2>Internship Scam Detector</h2>
 
-<textarea id="input" placeholder="Paste internship details here..."></textarea>
+<p>Paste internship/job details below to analyze scam risk using AI-based logic.</p>
+
+<textarea id="input" placeholder="Paste full internship/job details here: company, role, stipend, selection process, payment request, email/contact..."></textarea>
 
 <br>
 <button onclick="analyze()">Analyze</button>
@@ -23,41 +57,74 @@
 <script>
 function analyze() {
   let text = document.getElementById("input").value.toLowerCase();
+
   let score = 0;
   let redFlags = [];
+  let trustSignals = [];
 
-  if (text.includes("fee") || text.includes("pay")) {
+  // Scam keywords
+  if (text.includes("scam") || text.includes("fake") || text.includes("fraud")) {
+    score += 50;
+    redFlags.push("Suspicious scam-related wording detected");
+  }
+
+  // Payment detection
+  if (text.includes("fee") || text.includes("pay") || text.includes("deposit")) {
     score += 40;
     redFlags.push("Upfront payment required");
   }
 
+  // No interview
   if (text.includes("no interview") || text.includes("direct selection")) {
     score += 20;
     redFlags.push("No interview process");
   }
 
+  // WhatsApp
   if (text.includes("whatsapp")) {
     score += 10;
-    redFlags.push("Unofficial communication");
+    redFlags.push("Unofficial communication (WhatsApp)");
   }
 
+  // Gmail
   if (text.includes("gmail.com")) {
     score += 10;
     redFlags.push("Non-official email domain");
+  } else if (text.includes("@")) {
+    trustSignals.push("Official domain email detected");
   }
 
-  if (text.includes("30,000") || text.includes("50000")) {
+  // High salary
+  if (text.includes("30000") || text.includes("50000") || text.includes("80000")) {
     score += 10;
-    redFlags.push("Unrealistic stipend");
+    redFlags.push("Possibly unrealistic stipend");
   }
 
+  // Proper process
+  if (text.includes("interview")) {
+    trustSignals.push("Interview process mentioned");
+  }
+
+  // Cap score
+  if (score > 100) score = 100;
+
+  // Risk level
+  let risk = "SAFE";
+  if (score > 70) risk = "SCAM";
+  else if (score > 40) risk = "HIGH RISK";
+  else if (score > 20) risk = "VERIFY FIRST";
+
+  // Output formatting
   let result = "Scam Score: " + score + "/100\n\n";
+  result += "Risk Level: " + risk + "\n\n";
 
-  if (score > 70) result += "Risk Level: SCAM\n";
-  else if (score > 40) result += "Risk Level: HIGH RISK\n";
-  else result += "Risk Level: SAFE\n";
+  result += "Red Flags:\n";
+  if (redFlags.length === 0) result += "- None\n";
+  else result += "- " + redFlags.join("\n- ") + "\n";
 
-  result += "\nRed Flags:\n- " + redFlags.join("\n- ");
+  result += "\nTrust Signals:\n";
+  if (trustSignals.length === 0) result += "- None\n";
+  else result += "- " + trustSignals.join("\n- ");
 
   document.getElementById("output").innerText = result;
 }
@@ -65,4 +132,3 @@ function analyze() {
 
 </body>
 </html>
-<p>Paste internship details below to analyze scam risk using AI-based logic.</p>
